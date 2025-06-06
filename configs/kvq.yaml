@@ -1,0 +1,130 @@
+name: KVQ
+num_epochs: 40
+l_num_epochs: 0
+warmup_epochs: 2.5
+ema: true
+save_model: true 
+batch_size: 2
+num_workers: 8
+ddp: 0
+
+wandb:
+    flag: 0
+    project_name: KVQ
+
+data:
+    train:
+        type: FusionDataset
+        args:
+            phase: train
+            anno_file: ./labels/train_labels.txt
+            data_prefix: /datasets/6393/3568/datasets/QA/VQAs/lsvq/vids
+            get_close_matches: 1
+            sample_types:
+                fragments:
+                    vqa_input: Resize
+                    fragments_h: 14
+                    fragments_w: 14
+                    fsize_h: 32
+                    fsize_w: 32
+                    aligned: 8
+                    clip_len: 32
+                    frame_interval: 2
+                    t_frag: 8
+                    num_clips: 1 
+    val-l1080p:
+        type: FusionDataset
+        args:
+            phase: test
+            anno_file: ./labels/LSVQ/labels_1080p.txt
+            data_prefix: /datasets/6393/3568/datasets/QA/VQAs/lsvq/vids
+            get_close_matches: 1
+            sample_types:
+                fragments:
+                    vqa_input: Resize
+                    fragments_h: 14 #7
+                    fragments_w: 14 #7
+                    fsize_h: 32
+                    fsize_w: 32
+                    aligned: 8
+                    clip_len: 32 #32
+                    frame_interval: 2
+                    t_frag: 8 #8
+                    num_clips: 1
+    val-ltest:
+        type: FusionDataset
+        args:
+            phase: test
+            anno_file: ./labels/LSVQ/labels_test.txt
+            data_prefix: /datasets/6393/3568/datasets/QA/VQAs/lsvq/vids
+            get_close_matches: 1
+            sample_types:
+                fragments:
+                    vqa_input: Resize
+                    fragments_h: 14 #7
+                    fragments_w: 14 #7
+                    fsize_h: 32
+                    fsize_w: 32
+                    aligned: 8
+                    clip_len: 32 #32
+                    frame_interval: 2
+                    t_frag: 8 #8
+                    num_clips: 1
+    val-livevqc:
+        type: FusionDataset
+        args:
+            phase: test
+            anno_file: ./labels/LIVE_VQC/labels.txt
+            data_prefix: /datasets/6393/3568/datasets/QA/VQAs/live-vqc/vids
+            get_close_matches: 1
+            sample_types:
+                fragments:
+                    vqa_input: Resize
+                    fragments_h: 14 #7
+                    fragments_w: 14 #7
+                    fsize_h: 32
+                    fsize_w: 32
+                    aligned: 8
+                    clip_len: 32 #32
+                    frame_interval: 2
+                    t_frag: 8 #8
+                    num_clips: 1
+    val-kv1k:
+        type: FusionDataset
+        args:
+            phase: test
+            anno_file: ./labels/KoNViD/labels.txt
+            data_prefix: /datasets/6393/3568/datasets/QA/VQAs/konvid1k/vids
+            get_close_matches: 1
+            sample_types:
+                fragments:
+                    vqa_input: Resize
+                    fragments_h: 14 #7
+                    fragments_w: 14 #7
+                    fsize_h: 32
+                    fsize_w: 32
+                    aligned: 8
+                    clip_len: 32 #32
+                    frame_interval: 2
+                    t_frag: 8 #8
+                    num_clips: 1
+
+
+model:
+    type: KVQ
+    args:
+        backbone:
+            fragments:
+                checkpoint: True
+                act_mag_flag: True
+                cross_layer: [0, 0, 1, 1]
+        vqa_head:
+            in_channels: 768
+            hidden_channels: 64
+            
+optimizer:
+    lr: !!float 5e-4
+    backbone_lr_mult: !!float 0.1
+    wd: 0.05
+
+load_path: ./pretrained_weight/swin_tiny_patch244_window877_kinetics400_1k.pth
